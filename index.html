@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="一杯咖啡 - Lee 的个人页面。每天至少一杯咖啡，这是我给自己的片刻时间。">
+  <meta name="theme-color" content="#fafafa">
+  <!-- 内容安全策略：限制资源加载来源，防止 XSS 攻击 -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://api.qrserver.com data:; connect-src 'self' https://api.qrserver.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self';">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <title>一杯咖啡</title>
+  
+  <!-- 性能优化：预连接到 QR API -->
+  <link rel="preconnect" href="https://api.qrserver.com" crossorigin>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif;
+      background: #fafafa;
+      color: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: clamp(36px, 8vw, 64px);
+      font-weight: 300;
+      margin-bottom: 40px;
+      letter-spacing: -0.02em;
+      color: #1a1a1a;
+    }
+
+    .content {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: #4a4a4a;
+      margin-bottom: 30px;
+      line-height: 1.8;
+    }
+
+    .content p {
+      margin: 20px 0;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .highlight {
+      color: #1a1a1a;
+      font-weight: 500;
+    }
+
+    .footer {
+      margin-top: 60px;
+      font-size: 14px;
+      color: #8a8a8a;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .footer:hover {
+      opacity: 1;
+    }
+
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: #d0d0d0;
+      margin: 40px auto;
+    }
+
+    .contact {
+      margin: 40px 0;
+    }
+
+    .contact-button {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #1a1a1a;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .contact-button:hover {
+      background: #333;
+      transform: translateY(-1px);
+    }
+
+    .contact-button:active {
+      transform: translateY(0);
+    }
+
+    .contact-button:focus {
+      outline: 2px solid #1a1a1a;
+      outline-offset: 2px;
+    }
+
+    .contact-button:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    .qrcode-container {
+      display: none;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      margin-top: 20px;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .qrcode-container.show {
+      display: inline-block;
+    }
+
+    .qrcode-container:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    #qrcode {
+      display: block;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    #qrcode img,
+    #qrcode canvas {
+      display: block;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+    }
+
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e0e0e0;
+      border-top-color: #1a1a1a;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    .loading-text {
+      font-size: 13px;
+      color: #8a8a8a;
+      letter-spacing: 0.05em;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .error-message {
+      color: #d32f2f;
+      font-size: 13px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #0a0a0a;
+        color: #e0e0e0;
+      }
+
+      h1 {
+        color: #e0e0e0;
+      }
+
+      .content {
+        color: #b0b0b0;
+      }
+
+      .highlight {
+        color: #e0e0e0;
+      }
+
+      .footer {
+        color: #6a6a6a;
+      }
+
+      .divider {
+        background: #333;
+      }
+
+      .contact-button {
+        background: #e0e0e0;
+        color: #1a1a1a;
+      }
+
+      .contact-button:hover {
+        background: #b0b0b0;
+      }
+
+      .contact-button:focus {
+        outline-color: #e0e0e0;
+      }
+
+      .qrcode-container {
+        background: #1a1a1a;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .qrcode-container:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+
+      .loading-spinner {
+        border-color: #333;
+        border-top-color: #e0e0e0;
+      }
+
+      .loading-text {
+        color: #6a6a6a;
+      }
+
+      .error-message {
+        color: #f44336;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 20px;
+      }
+
+      h1 {
+        margin-bottom: 30px;
+      }
+
+      .content {
+        margin-bottom: 25px;
+      }
+
+      .footer {
+        margin-top: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>☕️ 一杯咖啡</h1>
+    
+    <div class="content">
+      <p>你好，我是 <span class="highlight">Lee</span>。</p>
+      <p>每天至少一杯咖啡，这是我给自己的片刻时间。</p>
+      <p>Sometimes espresso. Sometimes latte. Always coffee.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="contact">
+      <button class="contact-button" id="contactBtn" aria-label="显示联系方式二维码">Contact Me</button>
+      <div class="qrcode-container" id="qrcodeContainer">
+        <div id="qrcode">
+          <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">生成中...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // 使用 Base64 编码邮箱地址，防止被爬虫直接抓取
+    // 严格的邮箱格式验证正则表达式
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    
+    // 允许的邮箱域名白名单（防止生成恶意邮箱）
+    const ALLOWED_DOMAINS = ['acoffee.com'];
+    
+    // 验证邮箱域名是否在白名单中
+    function isValidEmailDomain(email) {
+      if (!email || typeof email !== 'string') {
+        return false;
+      }
+      const parts = email.split('@');
+      if (parts.length !== 2) {
+        return false;
+      }
+      const domain = parts[1].toLowerCase();
+      return ALLOWED_DOMAINS.includes(domain);
+    }
+    
+    // 安全地解码邮箱地址
+    function decodeEmail() {
+      try {
+        const encoded = 'aGVsbG9AYWNvZmZlZS5jb20=';
+        const decoded = atob(encoded);
+        
+        // 验证邮箱格式
+        if (!emailRegex.test(decoded)) {
+          console.error('Invalid email format');
+          return null;
+        }
+        
+        // 验证邮箱域名是否在白名单中
+        if (!isValidEmailDomain(decoded)) {
+          console.error('Email domain not in whitelist');
+          return null;
+        }
+        
+        // 验证邮箱长度（防止过长）
+        if (decoded.length > 254) {
+          console.error('Email too long');
+          return null;
+        }
+        
+        return decoded;
+      } catch (e) {
+        console.error('Email decoding error:', e);
+        return null;
+      }
+    }
+    
+    // 使用立即执行函数（IIFE）保护 email 变量，防止被外部修改
+    const emailConfig = (function() {
+      const email = decodeEmail();
+      if (!email) {
+        console.error('Failed to decode email address');
+        return { email: null, isValid: false };
+      }
+      
+      // 返回只读对象
+      return Object.freeze({
+        email: email,
+        isValid: true,
+        // 提供验证方法，每次生成二维码时重新验证
+        validate: function() {
+          if (!this.email || typeof this.email !== 'string') {
+            return false;
+          }
+          if (!emailRegex.test(this.email)) {
+            return false;
+          }
+          if (!isValidEmailDomain(this.email)) {
+            return false;
+          }
+          if (this.email.length > 254) {
+            return false;
+          }
+          return true;
+        }
+      });
+    })();
+    
+    let qrCodeGenerated = false;
+    
+    // 隐藏加载状态
+    function hideLoading() {
+      const loading = document.getElementById('loading');
+      if (loading) {
+        loading.style.display = 'none';
+      }
+    }
+    
+    // 安全地显示错误消息（避免使用 innerHTML）
+    function showErrorMessage(container, message) {
+      // 清除容器内容
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+      
+      // 使用 createElement 和 textContent 避免 XSS
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message';
+      errorDiv.textContent = message;
+      container.appendChild(errorDiv);
+    }
+    
+    // 使用在线 API 生成二维码（参考 bio_ok 的实现方式）
+    function generateQRCode() {
+      const qrcodeDiv = document.getElementById('qrcode');
+      if (!qrcodeDiv) return;
+      
+      // 严格验证邮箱配置
+      if (!emailConfig.isValid || !emailConfig.email) {
+        showErrorMessage(qrcodeDiv, '邮箱配置无效');
+        return;
+      }
+      
+      // 每次生成前重新验证邮箱（防止变量被篡改）
+      if (!emailConfig.validate()) {
+        showErrorMessage(qrcodeDiv, '邮箱验证失败');
+        return;
+      }
+      
+      // 获取邮箱地址（从受保护的对象中）
+      const email = emailConfig.email;
+      
+      // 再次验证邮箱格式和域名（双重检查）
+      if (!emailRegex.test(email)) {
+        showErrorMessage(qrcodeDiv, '邮箱格式无效');
+        return;
+      }
+      
+      if (!isValidEmailDomain(email)) {
+        showErrorMessage(qrcodeDiv, '邮箱域名不在允许列表中');
+        return;
+      }
+      
+      // 如果已经生成过，直接返回
+      if (qrCodeGenerated && qrcodeDiv.querySelector('img')) {
+        hideLoading();
+        return;
+      }
+      
+      // 确保加载状态显示
+      const loading = document.getElementById('loading');
+      if (loading) {
+        loading.style.display = 'flex';
+      }
+      
+      // 清除之前的内容（保留加载状态）
+      const existingImg = qrcodeDiv.querySelector('img');
+      if (existingImg) {
+        existingImg.remove();
+      }
+      
+      // 构建 mailto 链接（只使用验证过的邮箱）
+      const mailtoLink = `mailto:${email}`;
+      
+      // 验证 mailto 链接格式
+      if (!mailtoLink.startsWith('mailto:') || mailtoLink.length > 300) {
+        showErrorMessage(qrcodeDiv, '邮箱链接格式无效');
+        return;
+      }
+      
+      // 使用 encodeURIComponent 防止 URL 注入
+      const emailEncoded = encodeURIComponent(mailtoLink);
+      
+      // 限制 URL 长度，防止过长的参数
+      if (emailEncoded.length > 1000) {
+        showErrorMessage(qrcodeDiv, '邮箱地址过长');
+        return;
+      }
+      
+      // 验证编码后的字符串不包含恶意字符
+      if (emailEncoded.includes('<') || emailEncoded.includes('>') || emailEncoded.includes('"') || emailEncoded.includes("'")) {
+        showErrorMessage(qrcodeDiv, '邮箱地址包含非法字符');
+        return;
+      }
+      
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${emailEncoded}&margin=2`;
+      
+      // 创建图片元素
+      const img = document.createElement('img');
+      // 设置 referrerpolicy 防止 referrer 泄露
+      img.referrerPolicy = 'no-referrer';
+      // 验证 URL 是否以 HTTPS 开头
+      if (!qrUrl.startsWith('https://')) {
+        showErrorMessage(qrcodeDiv, '不安全的连接');
+        return;
+      }
+      img.src = qrUrl;
+      img.alt = '联系方式二维码 - 扫描以获取邮箱地址';
+      img.style.maxWidth = '100%';
+      img.style.height = 'auto';
+      img.style.borderRadius = '4px';
+      img.loading = 'eager'; // 立即加载，因为用户主动点击了
+      img.crossOrigin = 'anonymous'; // 设置 CORS
+      
+      // 图片加载成功
+      img.onload = function() {
+        // 验证图片是否真的加载成功（检查 naturalWidth）
+        if (img.naturalWidth === 0) {
+          showErrorMessage(qrcodeDiv, '二维码图片无效');
+          return;
+        }
+        hideLoading();
+        qrcodeDiv.appendChild(img);
+        qrCodeGenerated = true;
+      };
+      
+      // 图片加载失败
+      img.onerror = function() {
+        hideLoading();
+        showErrorMessage(qrcodeDiv, '二维码生成失败，请稍后重试');
+      };
+      
+      // 设置超时保护（10秒）
+      const timeout = setTimeout(function() {
+        if (!qrCodeGenerated) {
+          img.onerror();
+          clearTimeout(timeout);
+        }
+      }, 10000);
+    }
+    
+    // 显示二维码
+    function showQRCode() {
+      const container = document.getElementById('qrcodeContainer');
+      const button = document.getElementById('contactBtn');
+      
+      if (container && button) {
+        container.classList.add('show');
+        button.style.display = 'none';
+        
+        // 如果已经生成过，确保加载状态隐藏
+        if (qrCodeGenerated) {
+          hideLoading();
+        }
+        
+        generateQRCode();
+      }
+    }
+    
+    // 初始化按钮事件
+    function initContactButton() {
+      const button = document.getElementById('contactBtn');
+      if (button) {
+        button.addEventListener('click', showQRCode);
+      } else {
+        setTimeout(initContactButton, 50);
+      }
+    }
+    
+    // 页面加载完成后初始化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initContactButton);
+    } else {
+      initContactButton();
+    }
+  </script>
+</body>
+</html>
