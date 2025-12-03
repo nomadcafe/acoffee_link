@@ -1,0 +1,6 @@
+name = "acoffee"
+compatibility_date = "2025-12-03"
+
+[site]
+bucket = "."
+
