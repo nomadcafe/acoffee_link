@@ -1,6 +1,5 @@
 name = "acoffee"
 compatibility_date = "2025-12-03"
 
-[site]
-bucket = "."
+pages_build_output_dir = "."
 
