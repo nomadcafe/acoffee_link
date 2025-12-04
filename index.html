@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="一杯咖啡 - Lee 的个人页面。每天至少一杯咖啡，这是我给自己的片刻时间。">
+  <meta name="description" content="一杯咖啡 - Lee's personal page. At least one cup of coffee every day, a moment of peace for myself.">
   <meta name="theme-color" content="#fafafa">
   <!-- 内容安全策略：限制资源加载来源，防止 XSS 攻击 -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://api.qrserver.com data:; connect-src 'self' https://api.qrserver.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self';">
@@ -306,7 +306,7 @@
     <h1>☕️ 一杯咖啡</h1>
     
     <div class="content">
-      <p>Hello, i am <span class="highlight">Lee</span>.</p>
+      <p>Hello, I am <span class="highlight">Lee</span>.</p>
       <p>每天至少喝一杯咖啡，这是我给自己的片刻宁静。</p>
       <p>Sometimes espresso. Sometimes latte. Always coffee.</p>
       <p>But black coffee is still my favorite — the bitterness feels real.</p>
@@ -315,12 +315,12 @@
     <div class="divider"></div>
 
     <div class="contact">
-      <button class="contact-button" id="contactBtn" aria-label="显示联系方式二维码">Contact Me</button>
+      <button class="contact-button" id="contactBtn" aria-label="Show contact QR code">Contact Me</button>
       <div class="qrcode-container" id="qrcodeContainer">
         <div id="qrcode">
           <div class="loading" id="loading">
             <div class="loading-spinner"></div>
-            <div class="loading-text">生成中...</div>
+            <div class="loading-text">Generating...</div>
           </div>
         </div>
       </div>
@@ -446,13 +446,13 @@
       
       // 严格验证邮箱配置
       if (!emailConfig.isValid || !emailConfig.email) {
-        showErrorMessage(qrcodeDiv, '邮箱配置无效');
+        showErrorMessage(qrcodeDiv, 'Email configuration invalid');
         return;
       }
       
       // 每次生成前重新验证邮箱（防止变量被篡改）
       if (!emailConfig.validate()) {
-        showErrorMessage(qrcodeDiv, '邮箱验证失败');
+        showErrorMessage(qrcodeDiv, 'Email validation failed');
         return;
       }
       
@@ -461,12 +461,12 @@
       
       // 再次验证邮箱格式和域名（双重检查）
       if (!emailRegex.test(email)) {
-        showErrorMessage(qrcodeDiv, '邮箱格式无效');
+        showErrorMessage(qrcodeDiv, 'Invalid email format');
         return;
       }
       
       if (!isValidEmailDomain(email)) {
-        showErrorMessage(qrcodeDiv, '邮箱域名不在允许列表中');
+        showErrorMessage(qrcodeDiv, 'Email domain not in allowed list');
         return;
       }
       
@@ -493,7 +493,7 @@
       
       // 验证 mailto 链接格式
       if (!mailtoLink.startsWith('mailto:') || mailtoLink.length > 300) {
-        showErrorMessage(qrcodeDiv, '邮箱链接格式无效');
+        showErrorMessage(qrcodeDiv, 'Invalid email link format');
         return;
       }
       
@@ -502,13 +502,13 @@
       
       // 限制 URL 长度，防止过长的参数
       if (emailEncoded.length > 1000) {
-        showErrorMessage(qrcodeDiv, '邮箱地址过长');
+        showErrorMessage(qrcodeDiv, 'Email address too long');
         return;
       }
       
       // 验证编码后的字符串不包含恶意字符
       if (emailEncoded.includes('<') || emailEncoded.includes('>') || emailEncoded.includes('"') || emailEncoded.includes("'")) {
-        showErrorMessage(qrcodeDiv, '邮箱地址包含非法字符');
+        showErrorMessage(qrcodeDiv, 'Email address contains invalid characters');
         return;
       }
       
@@ -524,7 +524,7 @@
         return;
       }
       img.src = qrUrl;
-      img.alt = '联系方式二维码 - 扫描以获取邮箱地址';
+      img.alt = 'Contact QR code - Scan to get email address';
       img.style.maxWidth = '100%';
       img.style.height = 'auto';
       img.style.borderRadius = '4px';
@@ -535,7 +535,7 @@
       img.onload = function() {
         // 验证图片是否真的加载成功（检查 naturalWidth）
         if (img.naturalWidth === 0) {
-          showErrorMessage(qrcodeDiv, '二维码图片无效');
+          showErrorMessage(qrcodeDiv, 'Invalid QR code image');
           return;
         }
         hideLoading();
@@ -546,7 +546,7 @@
       // 图片加载失败
       img.onerror = function() {
         hideLoading();
-        showErrorMessage(qrcodeDiv, '二维码生成失败，请稍后重试');
+        showErrorMessage(qrcodeDiv, 'Failed to generate QR code. Please try again later.');
       };
       
       // 设置超时保护（10秒）
