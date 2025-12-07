@@ -307,7 +307,7 @@
     <h1 data-en="☕️ A Cup of Coffee" data-zh="☕️ 一杯咖啡">☕️ 一杯咖啡</h1>
     
     <div class="content">
-      <p data-en="Hello, I am <span class=&quot;highlight&quot;>Lee</span>." data-zh="你好，我是 <span class=&quot;highlight&quot;>Lee</span>。">Hello, I am <span class="highlight">Lee</span>.</p>
+      <p data-en="Hello, I am <span class='highlight'>Lee</span>." data-zh="你好，我是 <span class='highlight'>Lee</span>。">Hello, I am <span class="highlight">Lee</span>.</p>
       <p data-en="At least one cup of coffee every day, a moment of peace for myself." data-zh="每天至少喝一杯咖啡，这是我给自己的片刻宁静。">每天至少喝一杯咖啡，这是我给自己的片刻宁静。</p>
       <p>Sometimes espresso. Sometimes latte. Always coffee.</p>
       <p>But black coffee is still my favorite — the bitterness feels real.</p>
@@ -350,7 +350,11 @@
         if (text) {
           // 如果文本包含 HTML（如 <span>），使用 innerHTML，否则使用 textContent
           if (text.includes('<')) {
-            element.innerHTML = text;
+            // 将 HTML 实体转换为实际字符（如 &quot; 转为 "）
+            const tempDiv = document.createElement('div');
+            tempDiv.textContent = text;
+            const decodedText = tempDiv.innerHTML;
+            element.innerHTML = decodedText;
           } else {
             element.textContent = text;
           }
@@ -549,7 +553,7 @@
       img.referrerPolicy = 'no-referrer';
       // 验证 URL 是否以 HTTPS 开头
       if (!qrUrl.startsWith('https://')) {
-        showErrorMessage(qrcodeDiv, '不安全的连接');
+        showErrorMessage(qrcodeDiv, 'Unsafe connection');
         return;
       }
       img.src = qrUrl;
