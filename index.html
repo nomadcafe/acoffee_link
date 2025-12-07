@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en" id="htmlLang">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -304,11 +304,11 @@
 </head>
 <body>
   <div class="container">
-    <h1>☕️ 一杯咖啡</h1>
+    <h1 data-en="☕️ A Cup of Coffee" data-zh="☕️ 一杯咖啡">☕️ 一杯咖啡</h1>
     
     <div class="content">
-      <p>Hello, I am <span class="highlight">Lee</span>.</p>
-      <p>每天至少喝一杯咖啡，这是我给自己的片刻宁静。</p>
+      <p data-en="Hello, I am <span class=&quot;highlight&quot;>Lee</span>." data-zh="你好，我是 <span class=&quot;highlight&quot;>Lee</span>。">Hello, I am <span class="highlight">Lee</span>.</p>
+      <p data-en="At least one cup of coffee every day, a moment of peace for myself." data-zh="每天至少喝一杯咖啡，这是我给自己的片刻宁静。">每天至少喝一杯咖啡，这是我给自己的片刻宁静。</p>
       <p>Sometimes espresso. Sometimes latte. Always coffee.</p>
       <p>But black coffee is still my favorite — the bitterness feels real.</p>
     </div>
@@ -316,24 +316,52 @@
     <div class="divider"></div>
 
     <div class="contact">
-      <button class="contact-button" id="contactBtn">Contact Me</button>
+      <button class="contact-button" id="contactBtn" data-en="Contact Me" data-zh="联系我">Contact Me</button>
       <div class="qrcode-container" id="qrcodeContainer">
         <div id="qrcode">
           <div class="loading" id="loading">
             <div class="loading-spinner"></div>
-            <div class="loading-text">Generating...</div>
+            <div class="loading-text" data-en="Generating..." data-zh="生成中...">Generating...</div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="disclaimer">
-      This website is not affiliated with buymeacoffee.com
-    </div>
+    <div class="disclaimer" data-en="This website is not affiliated with buymeacoffee.com" data-zh="本网站与 buymeacoffee.com 没有任何关系">This website is not affiliated with buymeacoffee.com</div>
 
   </div>
 
   <script>
+    // 语言切换功能
+    function detectLanguage() {
+      // 检测浏览器语言
+      const browserLang = navigator.language || navigator.userLanguage;
+      // 检查是否是中文（包括 zh-CN, zh-TW, zh-HK 等）
+      return browserLang.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+    }
+    
+    function switchLanguage(lang) {
+      const html = document.documentElement;
+      html.setAttribute('lang', lang);
+      
+      // 切换所有带有 data-en 和 data-zh 属性的元素
+      document.querySelectorAll('[data-en][data-zh]').forEach(function(element) {
+        const text = element.getAttribute('data-' + lang);
+        if (text) {
+          // 如果文本包含 HTML（如 <span>），使用 innerHTML，否则使用 textContent
+          if (text.includes('<')) {
+            element.innerHTML = text;
+          } else {
+            element.textContent = text;
+          }
+        }
+      });
+    }
+    
+    // 页面加载时自动切换语言
+    const currentLang = detectLanguage();
+    switchLanguage(currentLang);
+    
     // 使用 Base64 编码邮箱地址，防止被爬虫直接抓取
     // 严格的邮箱格式验证正则表达式
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
