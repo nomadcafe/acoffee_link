@@ -304,7 +304,7 @@
 </head>
 <body>
   <div class="container">
-    <h1 data-en="☕️ A Coffee Cafe Dream" data-zh="☕️ 一杯咖啡引起的伟大畅想">☕️ 一杯咖啡引起的伟大畅想</h1>
+    <h1 data-en="☕️ A Cup of Coffee's Great Vision" data-zh="☕️ 一杯咖啡引起的伟大畅想">☕️ 一杯咖啡引起的伟大畅想</h1>
     
     <div class="content">
       <p data-en="Hello, I am <span class=&quot;highlight&quot;>Lee</span>." data-zh="你好，我是 <span class=&quot;highlight&quot;>Lee</span>。">Hello, I am <span class="highlight">Lee</span>.</p>
@@ -333,6 +333,43 @@
   </div>
 
   <script>
+    // 当前语言（全局变量，供其他函数使用）
+    let currentLang = 'en';
+    
+    // 错误消息多语言映射
+    const errorMessages = {
+      'zh': {
+        'EMAIL_CONFIG_INVALID': '邮箱配置无效',
+        'EMAIL_VALIDATION_FAILED': '邮箱验证失败',
+        'INVALID_EMAIL_FORMAT': '邮箱格式无效',
+        'EMAIL_DOMAIN_NOT_ALLOWED': '邮箱域名不在允许列表中',
+        'INVALID_EMAIL_LINK': '邮箱链接格式无效',
+        'EMAIL_TOO_LONG': '邮箱地址过长',
+        'EMAIL_INVALID_CHARS': '邮箱地址包含无效字符',
+        'UNSAFE_CONNECTION': '不安全的连接',
+        'INVALID_QR_IMAGE': '无效的二维码图片',
+        'QR_GENERATION_FAILED': '生成二维码失败，请稍后重试。'
+      },
+      'en': {
+        'EMAIL_CONFIG_INVALID': 'Email configuration invalid',
+        'EMAIL_VALIDATION_FAILED': 'Email validation failed',
+        'INVALID_EMAIL_FORMAT': 'Invalid email format',
+        'EMAIL_DOMAIN_NOT_ALLOWED': 'Email domain not in allowed list',
+        'INVALID_EMAIL_LINK': 'Invalid email link format',
+        'EMAIL_TOO_LONG': 'Email address too long',
+        'EMAIL_INVALID_CHARS': 'Email address contains invalid characters',
+        'UNSAFE_CONNECTION': 'Unsafe connection',
+        'INVALID_QR_IMAGE': 'Invalid QR code image',
+        'QR_GENERATION_FAILED': 'Failed to generate QR code. Please try again later.'
+      }
+    };
+    
+    // 二维码图片 alt 文本多语言映射
+    const qrCodeAltTexts = {
+      'zh': '联系二维码 - 扫描获取邮箱地址',
+      'en': 'Contact QR code - Scan to get email address'
+    };
+    
     // 语言切换功能
     function detectLanguage() {
       // 检测浏览器语言
@@ -342,8 +379,30 @@
     }
     
     function switchLanguage(lang) {
+      // 更新全局语言变量
+      currentLang = lang;
+      
       const html = document.documentElement;
       html.setAttribute('lang', lang);
+      
+      // 切换页面标题
+      const titles = {
+        'zh': '一杯咖啡引起的伟大畅想',
+        'en': "A Cup of Coffee's Great Vision"
+      };
+      if (titles[lang]) {
+        document.title = titles[lang];
+      }
+      
+      // 切换页面描述
+      const descriptions = {
+        'zh': '一杯咖啡引起的伟大畅想 - Lee的个人页面。每天至少喝一杯咖啡，这是我给自己的片刻宁静。',
+        'en': "A Cup of Coffee's Great Vision - Lee's personal page. At least one cup of coffee every day, a moment of peace for myself."
+      };
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription && descriptions[lang]) {
+        metaDescription.setAttribute('content', descriptions[lang]);
+      }
       
       // 切换所有带有 data-en 和 data-zh 属性的元素
       document.querySelectorAll('[data-en][data-zh]').forEach(function(element) {
@@ -358,10 +417,16 @@
           }
         }
       });
+      
+      // 更新已存在的二维码图片 alt 文本
+      const qrImg = document.querySelector('#qrcode img');
+      if (qrImg && qrCodeAltTexts[lang]) {
+        qrImg.alt = qrCodeAltTexts[lang];
+      }
     }
     
     // 页面加载时自动切换语言
-    const currentLang = detectLanguage();
+    currentLang = detectLanguage();
     switchLanguage(currentLang);
     
     // 使用 Base64 编码邮箱地址，防止被爬虫直接抓取
@@ -457,11 +522,16 @@
     }
     
     // 安全地显示错误消息（避免使用 innerHTML）
-    function showErrorMessage(container, message) {
+    function showErrorMessage(container, errorCode) {
       // 清除容器内容
       while (container.firstChild) {
         container.removeChild(container.firstChild);
       }
+      
+      // 根据当前语言获取错误消息
+      const message = errorMessages[currentLang] && errorMessages[currentLang][errorCode] 
+        ? errorMessages[currentLang][errorCode] 
+        : (errorMessages['en'][errorCode] || 'An error occurred');
       
       // 使用 createElement 和 textContent 避免 XSS
       const errorDiv = document.createElement('div');
@@ -477,13 +547,13 @@
       
       // 严格验证邮箱配置
       if (!emailConfig.isValid || !emailConfig.email) {
-        showErrorMessage(qrcodeDiv, 'Email configuration invalid');
+        showErrorMessage(qrcodeDiv, 'EMAIL_CONFIG_INVALID');
         return;
       }
       
       // 每次生成前重新验证邮箱（防止变量被篡改）
       if (!emailConfig.validate()) {
-        showErrorMessage(qrcodeDiv, 'Email validation failed');
+        showErrorMessage(qrcodeDiv, 'EMAIL_VALIDATION_FAILED');
         return;
       }
       
@@ -492,12 +562,12 @@
       
       // 再次验证邮箱格式和域名（双重检查）
       if (!emailRegex.test(email)) {
-        showErrorMessage(qrcodeDiv, 'Invalid email format');
+        showErrorMessage(qrcodeDiv, 'INVALID_EMAIL_FORMAT');
         return;
       }
       
       if (!isValidEmailDomain(email)) {
-        showErrorMessage(qrcodeDiv, 'Email domain not in allowed list');
+        showErrorMessage(qrcodeDiv, 'EMAIL_DOMAIN_NOT_ALLOWED');
         return;
       }
       
@@ -524,7 +594,7 @@
       
       // 验证 mailto 链接格式
       if (!mailtoLink.startsWith('mailto:') || mailtoLink.length > 300) {
-        showErrorMessage(qrcodeDiv, 'Invalid email link format');
+        showErrorMessage(qrcodeDiv, 'INVALID_EMAIL_LINK');
         return;
       }
       
@@ -533,13 +603,13 @@
       
       // 限制 URL 长度，防止过长的参数
       if (emailEncoded.length > 1000) {
-        showErrorMessage(qrcodeDiv, 'Email address too long');
+        showErrorMessage(qrcodeDiv, 'EMAIL_TOO_LONG');
         return;
       }
       
       // 验证编码后的字符串不包含恶意字符
       if (emailEncoded.includes('<') || emailEncoded.includes('>') || emailEncoded.includes('"') || emailEncoded.includes("'")) {
-        showErrorMessage(qrcodeDiv, 'Email address contains invalid characters');
+        showErrorMessage(qrcodeDiv, 'EMAIL_INVALID_CHARS');
         return;
       }
       
@@ -551,11 +621,12 @@
       img.referrerPolicy = 'no-referrer';
       // 验证 URL 是否以 HTTPS 开头
       if (!qrUrl.startsWith('https://')) {
-        showErrorMessage(qrcodeDiv, 'Unsafe connection');
+        showErrorMessage(qrcodeDiv, 'UNSAFE_CONNECTION');
         return;
       }
       img.src = qrUrl;
-      img.alt = 'Contact QR code - Scan to get email address';
+      // 根据当前语言设置 alt 文本
+      img.alt = qrCodeAltTexts[currentLang] || qrCodeAltTexts['en'];
       img.style.maxWidth = '100%';
       img.style.height = 'auto';
       img.style.borderRadius = '4px';
@@ -566,7 +637,7 @@
       img.onload = function() {
         // 验证图片是否真的加载成功（检查 naturalWidth）
         if (img.naturalWidth === 0) {
-          showErrorMessage(qrcodeDiv, 'Invalid QR code image');
+          showErrorMessage(qrcodeDiv, 'INVALID_QR_IMAGE');
           return;
         }
         hideLoading();
@@ -577,7 +648,7 @@
       // 图片加载失败
       img.onerror = function() {
         hideLoading();
-        showErrorMessage(qrcodeDiv, 'Failed to generate QR code. Please try again later.');
+        showErrorMessage(qrcodeDiv, 'QR_GENERATION_FAILED');
       };
       
       // 设置超时保护（10秒）
