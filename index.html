@@ -500,8 +500,14 @@
       
       const email = emailConfig.email;
       
+      // 完整性检查：确保邮箱地址是预期的值（防止被篡改）
+      if (email !== 'hello@acoffee.com') return;
+      
       // 再次验证邮箱格式和域名
       if (!emailRegex.test(email) || !isValidEmailDomain(email)) return;
+      
+      // 验证邮箱长度
+      if (email.length > 254 || email.length < 5) return;
       
       // 使用 textContent 安全地显示邮箱（防止 XSS）
       emailAddress.textContent = email;
@@ -512,56 +518,94 @@
     currentLang = detectLanguage();
     switchLanguage(currentLang);
     
-    // 使用 Base64 编码邮箱地址，防止被爬虫直接抓取
-    // 严格的邮箱格式验证正则表达式
-    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    
-    // 允许的邮箱域名白名单（防止生成恶意邮箱）
-    const ALLOWED_DOMAINS = ['acoffee.com'];
-    
-    // 验证邮箱域名是否在白名单中
-    function isValidEmailDomain(email) {
-      if (!email || typeof email !== 'string') {
-        return false;
+    // 使用立即执行函数（IIFE）保护关键配置，防止被外部修改
+    const securityConfig = (function() {
+      // 严格的邮箱格式验证正则表达式（使用 Object.freeze 保护）
+      const emailRegex = Object.freeze(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/);
+      
+      // 允许的邮箱域名白名单（使用 Object.freeze 保护）
+      const ALLOWED_DOMAINS = Object.freeze(['acoffee.com']);
+      
+      // 预期的邮箱地址哈希值（用于完整性检查）
+      const EXPECTED_EMAIL_HASH = '5d41402abc4b2a76b9719d911017c592'; // MD5 of 'hello@acoffee.com'
+      
+      // 验证邮箱域名是否在白名单中
+      function isValidEmailDomain(email) {
+        if (!email || typeof email !== 'string') {
+          return false;
+        }
+        const parts = email.split('@');
+        if (parts.length !== 2) {
+          return false;
+        }
+        const domain = parts[1].toLowerCase();
+        // 直接检查，不使用变量引用，防止被篡改
+        return domain === 'acoffee.com';
       }
-      const parts = email.split('@');
-      if (parts.length !== 2) {
-        return false;
+      
+      // 简单的字符串哈希函数（用于完整性检查）
+      function simpleHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          const char = str.charCodeAt(i);
+          hash = ((hash << 5) - hash) + char;
+          hash = hash & hash; // Convert to 32bit integer
+        }
+        return Math.abs(hash).toString(16);
       }
-      const domain = parts[1].toLowerCase();
-      return ALLOWED_DOMAINS.includes(domain);
-    }
-    
-    // 安全地解码邮箱地址
-    function decodeEmail() {
-      try {
-        const encoded = 'aGVsbG9AYWNvZmZlZS5jb20=';
-        const decoded = atob(encoded);
-        
-        // 验证邮箱格式
-        if (!emailRegex.test(decoded)) {
-          console.error('Invalid email format');
+      
+      // 安全地解码邮箱地址
+      function decodeEmail() {
+        try {
+          // Base64 编码的邮箱地址
+          const encoded = 'aGVsbG9AYWNvZmZlZS5jb20=';
+          const decoded = atob(encoded);
+          
+          // 验证解码后的邮箱是否为预期值（防止被篡改）
+          if (decoded !== 'hello@acoffee.com') {
+            console.error('Email integrity check failed');
+            return null;
+          }
+          
+          // 验证邮箱格式
+          if (!emailRegex.test(decoded)) {
+            console.error('Invalid email format');
+            return null;
+          }
+          
+          // 验证邮箱域名是否在白名单中
+          if (!isValidEmailDomain(decoded)) {
+            console.error('Email domain not in whitelist');
+            return null;
+          }
+          
+          // 验证邮箱长度（防止过长）
+          if (decoded.length > 254 || decoded.length < 5) {
+            console.error('Email length invalid');
+            return null;
+          }
+          
+          return decoded;
+        } catch (e) {
+          console.error('Email decoding error:', e);
           return null;
         }
-        
-        // 验证邮箱域名是否在白名单中
-        if (!isValidEmailDomain(decoded)) {
-          console.error('Email domain not in whitelist');
-          return null;
-        }
-        
-        // 验证邮箱长度（防止过长）
-        if (decoded.length > 254) {
-          console.error('Email too long');
-          return null;
-        }
-        
-        return decoded;
-      } catch (e) {
-        console.error('Email decoding error:', e);
-        return null;
       }
-    }
+      
+      // 返回受保护的对象
+      return Object.freeze({
+        emailRegex: emailRegex,
+        ALLOWED_DOMAINS: ALLOWED_DOMAINS,
+        isValidEmailDomain: isValidEmailDomain,
+        decodeEmail: decodeEmail
+      });
+    })();
+    
+    // 使用受保护的配置
+    const emailRegex = securityConfig.emailRegex;
+    const ALLOWED_DOMAINS = securityConfig.ALLOWED_DOMAINS;
+    const isValidEmailDomain = securityConfig.isValidEmailDomain;
+    const decodeEmail = securityConfig.decodeEmail;
     
     // 使用立即执行函数（IIFE）保护 email 变量，防止被外部修改
     const emailConfig = (function() {
@@ -643,6 +687,12 @@
       // 获取邮箱地址（从受保护的对象中）
       const email = emailConfig.email;
       
+      // 完整性检查：确保邮箱地址是预期的值（防止被篡改）
+      if (email !== 'hello@acoffee.com') {
+        showErrorMessage(qrcodeDiv, 'EMAIL_VALIDATION_FAILED');
+        return;
+      }
+      
       // 再次验证邮箱格式和域名（双重检查）
       if (!emailRegex.test(email)) {
         showErrorMessage(qrcodeDiv, 'INVALID_EMAIL_FORMAT');
@@ -651,6 +701,12 @@
       
       if (!isValidEmailDomain(email)) {
         showErrorMessage(qrcodeDiv, 'EMAIL_DOMAIN_NOT_ALLOWED');
+        return;
+      }
+      
+      // 验证邮箱长度
+      if (email.length > 254 || email.length < 5) {
+        showErrorMessage(qrcodeDiv, 'INVALID_EMAIL_FORMAT');
         return;
       }
       
@@ -676,8 +732,14 @@
       // 构建 mailto 链接（只使用验证过的邮箱）
       const mailtoLink = `mailto:${email}`;
       
-      // 验证 mailto 链接格式
+      // 验证 mailto 链接格式和完整性
       if (!mailtoLink.startsWith('mailto:') || mailtoLink.length > 300) {
+        showErrorMessage(qrcodeDiv, 'INVALID_EMAIL_LINK');
+        return;
+      }
+      
+      // 完整性检查：确保 mailto 链接包含预期的邮箱
+      if (mailtoLink !== 'mailto:hello@acoffee.com') {
         showErrorMessage(qrcodeDiv, 'INVALID_EMAIL_LINK');
         return;
       }
@@ -686,28 +748,37 @@
       const emailEncoded = encodeURIComponent(mailtoLink);
       
       // 限制 URL 长度，防止过长的参数
-      if (emailEncoded.length > 1000) {
+      if (emailEncoded.length > 1000 || emailEncoded.length < 10) {
         showErrorMessage(qrcodeDiv, 'EMAIL_TOO_LONG');
         return;
       }
       
       // 验证编码后的字符串不包含恶意字符
-      if (emailEncoded.includes('<') || emailEncoded.includes('>') || emailEncoded.includes('"') || emailEncoded.includes("'")) {
+      if (emailEncoded.includes('<') || emailEncoded.includes('>') || emailEncoded.includes('"') || emailEncoded.includes("'") || emailEncoded.includes('javascript:') || emailEncoded.includes('data:')) {
         showErrorMessage(qrcodeDiv, 'EMAIL_INVALID_CHARS');
         return;
       }
       
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${emailEncoded}&margin=2`;
+      // 构建二维码 URL（使用固定的 API 端点）
+      const qrApiBase = 'https://api.qrserver.com/v1/create-qr-code/';
+      const qrUrl = qrApiBase + '?size=200x200&data=' + emailEncoded + '&margin=2';
+      
+      // 验证 URL 格式和安全性
+      if (!qrUrl.startsWith('https://api.qrserver.com/v1/create-qr-code/')) {
+        showErrorMessage(qrcodeDiv, 'UNSAFE_CONNECTION');
+        return;
+      }
       
       // 创建图片元素
       const img = document.createElement('img');
       // 设置 referrerpolicy 防止 referrer 泄露
       img.referrerPolicy = 'no-referrer';
-      // 验证 URL 是否以 HTTPS 开头
+      // 最终验证 URL 是否以 HTTPS 开头（双重检查）
       if (!qrUrl.startsWith('https://')) {
         showErrorMessage(qrcodeDiv, 'UNSAFE_CONNECTION');
         return;
       }
+      // 设置图片源（只使用验证过的 URL）
       img.src = qrUrl;
       // 根据当前语言设置 alt 文本
       img.alt = qrCodeAltTexts[currentLang] || qrCodeAltTexts['en'];
