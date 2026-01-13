@@ -217,6 +217,37 @@
       text-align: center;
     }
 
+    .email-display {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e0e0e0;
+      text-align: center;
+      font-size: 14px;
+      color: #4a4a4a;
+    }
+
+    .email-label {
+      display: block;
+      font-size: 12px;
+      color: #8a8a8a;
+      margin-bottom: 6px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .email-address {
+      font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+      font-size: 14px;
+      color: #1a1a1a;
+      word-break: break-all;
+      user-select: all;
+      cursor: text;
+    }
+
+    .email-address:hover {
+      color: #333;
+    }
+
     @media (prefers-color-scheme: dark) {
       body {
         background: #0a0a0a;
@@ -281,6 +312,22 @@
       .error-message {
         color: #f44336;
       }
+
+      .email-display {
+        border-top-color: #333;
+      }
+
+      .email-label {
+        color: #6a6a6a;
+      }
+
+      .email-address {
+        color: #e0e0e0;
+      }
+
+      .email-address:hover {
+        color: #b0b0b0;
+      }
     }
 
     @media (max-width: 768px) {
@@ -324,6 +371,10 @@
             <div class="loading-spinner"></div>
             <div class="loading-text" data-en="Generating..." data-zh="生成中...">Generating...</div>
           </div>
+        </div>
+        <div class="email-display" id="emailDisplay" style="display: none;">
+          <span class="email-label" id="emailLabel" data-en="Email" data-zh="邮箱">Email</span>
+          <div class="email-address" id="emailAddress"></div>
         </div>
       </div>
     </div>
@@ -423,6 +474,38 @@
       if (qrImg && qrCodeAltTexts[lang]) {
         qrImg.alt = qrCodeAltTexts[lang];
       }
+      
+      // 更新邮箱标签
+      const emailLabel = document.getElementById('emailLabel');
+      if (emailLabel) {
+        const labelText = emailLabel.getAttribute('data-' + lang);
+        if (labelText) {
+          emailLabel.textContent = labelText;
+        }
+      }
+    }
+    
+    // 安全地显示邮箱地址（防止被爬虫直接抓取）
+    function displayEmailAddress() {
+      const emailDisplay = document.getElementById('emailDisplay');
+      const emailAddress = document.getElementById('emailAddress');
+      
+      if (!emailDisplay || !emailAddress) return;
+      
+      // 从受保护的 emailConfig 获取邮箱
+      if (!emailConfig.isValid || !emailConfig.email) return;
+      
+      // 验证邮箱
+      if (!emailConfig.validate()) return;
+      
+      const email = emailConfig.email;
+      
+      // 再次验证邮箱格式和域名
+      if (!emailRegex.test(email) || !isValidEmailDomain(email)) return;
+      
+      // 使用 textContent 安全地显示邮箱（防止 XSS）
+      emailAddress.textContent = email;
+      emailDisplay.style.display = 'block';
     }
     
     // 页面加载时自动切换语言
@@ -571,9 +654,10 @@
         return;
       }
       
-      // 如果已经生成过，直接返回
+      // 如果已经生成过，直接返回并显示邮箱
       if (qrCodeGenerated && qrcodeDiv.querySelector('img')) {
         hideLoading();
+        displayEmailAddress();
         return;
       }
       
@@ -643,6 +727,8 @@
         hideLoading();
         qrcodeDiv.appendChild(img);
         qrCodeGenerated = true;
+        // 显示邮箱地址
+        displayEmailAddress();
       };
       
       // 图片加载失败
@@ -669,9 +755,10 @@
         container.classList.add('show');
         button.style.display = 'none';
         
-        // 如果已经生成过，确保加载状态隐藏
+        // 如果已经生成过，确保加载状态隐藏并显示邮箱
         if (qrCodeGenerated) {
           hideLoading();
+          displayEmailAddress();
         }
         
         generateQRCode();
