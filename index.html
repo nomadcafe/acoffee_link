@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="一杯咖啡引起的伟大畅想 - Lee's personal page. At least one cup of coffee every day, a moment of peace for myself.">
-  <meta name="theme-color" content="#fafafa">
+  <meta name="description" content="A Cup of Coffee's Great Vision - Lee's personal page. At least one cup of coffee every day, a moment of peace for myself.">
+  <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
   <meta name="robots" content="noindex, nofollow">
-  <!-- 内容安全策略：限制资源加载来源，防止 XSS 攻击 -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://api.qrserver.com data:; connect-src 'self' https://api.qrserver.com https://cloudflareinsights.com; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self';">
-  <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>一杯咖啡引起的伟大畅想</title>
-  
-  <!-- 性能优化：预连接到 QR API -->
-  <link rel="preconnect" href="https://api.qrserver.com" crossorigin>
+  <!-- 内容安全策略等安全响应头见 _headers -->
+  <title>A Cup of Coffee's Great Vision</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
     }
 
     body {
@@ -78,17 +78,6 @@
       font-weight: 500;
     }
 
-    .footer {
-      margin-top: 60px;
-      font-size: 14px;
-      color: #8a8a8a;
-      opacity: 0.7;
-      transition: opacity 0.3s ease;
-    }
-
-    .footer:hover {
-      opacity: 1;
-    }
 
     .disclaimer {
       margin-top: 40px;
@@ -143,7 +132,7 @@
     }
 
     .qrcode-container {
-      display: none;
+      display: inline-block;
       padding: 20px;
       background: #ffffff;
       border-radius: 8px;
@@ -153,8 +142,8 @@
       animation: fadeIn 0.3s ease-in;
     }
 
-    .qrcode-container.show {
-      display: inline-block;
+    .qrcode-container:focus {
+      outline: none;
     }
 
     .qrcode-container:hover {
@@ -162,59 +151,13 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    #qrcode {
+    .qrcode {
       display: block;
       width: 200px;
       height: 200px;
       margin: 0 auto;
-      position: relative;
-    }
-
-    #qrcode img,
-    #qrcode canvas {
-      display: block;
-      width: 200px;
-      height: 200px;
-      margin: 0 auto;
-    }
-
-    .loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 200px;
-      height: 200px;
-      margin: 0 auto;
-    }
-
-    .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #e0e0e0;
-      border-top-color: #1a1a1a;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 12px;
-    }
-
-    .loading-text {
-      font-size: 13px;
-      color: #8a8a8a;
-      letter-spacing: 0.05em;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .error-message {
-      color: #d32f2f;
-      font-size: 13px;
-      padding: 10px;
-      text-align: center;
+      border-radius: 4px;
+      background: #ffffff;
     }
 
     .email-display {
@@ -240,12 +183,31 @@
       font-size: 14px;
       color: #1a1a1a;
       word-break: break-all;
-      user-select: all;
-      cursor: text;
+      text-decoration: none;
+      border-bottom: 1px solid #d0d0d0;
     }
 
     .email-address:hover {
       color: #333;
+      border-bottom-color: currentColor;
+    }
+
+    .copy-button {
+      margin-left: 8px;
+      padding: 2px 8px;
+      background: none;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 12px;
+      color: #8a8a8a;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+
+    .copy-button:hover {
+      color: #1a1a1a;
+      border-color: #1a1a1a;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -266,9 +228,6 @@
         color: #e0e0e0;
       }
 
-      .footer {
-        color: #6a6a6a;
-      }
 
       .disclaimer {
         color: #6a6a6a;
@@ -300,19 +259,6 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
       }
 
-      .loading-spinner {
-        border-color: #333;
-        border-top-color: #e0e0e0;
-      }
-
-      .loading-text {
-        color: #6a6a6a;
-      }
-
-      .error-message {
-        color: #f44336;
-      }
-
       .email-display {
         border-top-color: #333;
       }
@@ -325,8 +271,31 @@
         color: #e0e0e0;
       }
 
+      .email-address {
+        border-bottom-color: #555;
+      }
+
       .email-address:hover {
         color: #b0b0b0;
+      }
+
+      .copy-button {
+        border-color: #444;
+        color: #6a6a6a;
+      }
+
+      .copy-button:hover {
+        color: #e0e0e0;
+        border-color: #e0e0e0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
       }
     }
 
@@ -343,38 +312,31 @@
         margin-bottom: 25px;
       }
 
-      .footer {
-        margin-top: 40px;
-      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 data-en="☕️ A Cup of Coffee's Great Vision" data-zh="☕️ 一杯咖啡引起的伟大畅想">☕️ 一杯咖啡引起的伟大畅想</h1>
+    <h1 data-en="☕️ A Cup of Coffee's Great Vision" data-zh="☕️ 一杯咖啡引起的伟大畅想">☕️ A Cup of Coffee's Great Vision</h1>
     
     <div class="content">
       <p data-en="Hello, I am <span class=&quot;highlight&quot;>Lee</span>." data-zh="你好，我是 <span class=&quot;highlight&quot;>Lee</span>。">Hello, I am <span class="highlight">Lee</span>.</p>
-      <p data-en="At least one cup of coffee every day, a moment of peace for myself." data-zh="每天至少喝一杯咖啡，这是我给自己的片刻宁静。">每天至少喝一杯咖啡，这是我给自己的片刻宁静。</p>
+      <p data-en="At least one cup of coffee every day, a moment of peace for myself." data-zh="每天至少喝一杯咖啡，这是我给自己的片刻宁静。">At least one cup of coffee every day, a moment of peace for myself.</p>
       <p data-en="Sometimes espresso. Sometimes latte. Always coffee." data-zh="有时是意式浓缩，有时是拿铁，但总是咖啡。">Sometimes espresso. Sometimes latte. Always coffee.</p>
       <p data-en="But black coffee is still my favorite — the bitterness feels real." data-zh="但黑咖啡仍然是我的最爱——苦涩的感觉很真实。">But black coffee is still my favorite — the bitterness feels real.</p>
-      <p data-en="I hope one day I can open a cool coffee cafe, but the coffee cafes today always seem to be missing something." data-zh="我希望有一天我能够开一家很酷的咖啡店，现在的咖啡店总觉得缺少了一些东西。">我希望有一天我能够开一家很酷的咖啡店，现在的咖啡店总觉得缺少了一些东西。</p>
+      <p data-en="I hope one day I can open a cool coffee cafe, but the coffee cafes today always seem to be missing something." data-zh="我希望有一天我能够开一家很酷的咖啡店，现在的咖啡店总觉得缺少了一些东西。">I hope one day I can open a cool coffee cafe, but the coffee cafes today always seem to be missing something.</p>
     </div>
 
     <div class="divider"></div>
 
     <div class="contact">
-      <button class="contact-button" id="contactBtn" data-en="Contact Me" data-zh="联系我">Contact Me</button>
-      <div class="qrcode-container" id="qrcodeContainer">
-        <div id="qrcode">
-          <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
-            <div class="loading-text" data-en="Generating..." data-zh="生成中...">Generating...</div>
-          </div>
-        </div>
-        <div class="email-display" id="emailDisplay" style="display: none;">
-          <span class="email-label" id="emailLabel" data-en="Email" data-zh="邮箱">Email</span>
-          <div class="email-address" id="emailAddress"></div>
+      <button type="button" class="contact-button" id="contactBtn" aria-expanded="false" aria-controls="qrcodeContainer" data-en="Contact Me" data-zh="联系我">Contact Me</button>
+      <div class="qrcode-container" id="qrcodeContainer" tabindex="-1" hidden>
+        <img class="qrcode" id="qrImg" data-src="qr.svg" width="200" height="200" alt="Contact QR code - Scan to get email address" data-alt-en="Contact QR code - Scan to get email address" data-alt-zh="联系二维码 - 扫描获取邮箱地址">
+        <div class="email-display">
+          <span class="email-label" data-en="Email" data-zh="邮箱">Email</span>
+          <a class="email-address" id="emailAddress"></a>
+          <button type="button" class="copy-button" id="copyBtn" data-en="Copy" data-zh="复制">Copy</button>
         </div>
       </div>
     </div>
@@ -383,475 +345,6 @@
 
   </div>
 
-  <script>
-    // 当前语言（全局变量，供其他函数使用）
-    let currentLang = 'en';
-    
-    // 错误消息多语言映射
-    const errorMessages = {
-      'zh': {
-        'EMAIL_CONFIG_INVALID': '邮箱配置无效',
-        'EMAIL_VALIDATION_FAILED': '邮箱验证失败',
-        'INVALID_EMAIL_FORMAT': '邮箱格式无效',
-        'EMAIL_DOMAIN_NOT_ALLOWED': '邮箱域名不在允许列表中',
-        'INVALID_EMAIL_LINK': '邮箱链接格式无效',
-        'EMAIL_TOO_LONG': '邮箱地址过长',
-        'EMAIL_INVALID_CHARS': '邮箱地址包含无效字符',
-        'UNSAFE_CONNECTION': '不安全的连接',
-        'INVALID_QR_IMAGE': '无效的二维码图片',
-        'QR_GENERATION_FAILED': '生成二维码失败，请稍后重试。'
-      },
-      'en': {
-        'EMAIL_CONFIG_INVALID': 'Email configuration invalid',
-        'EMAIL_VALIDATION_FAILED': 'Email validation failed',
-        'INVALID_EMAIL_FORMAT': 'Invalid email format',
-        'EMAIL_DOMAIN_NOT_ALLOWED': 'Email domain not in allowed list',
-        'INVALID_EMAIL_LINK': 'Invalid email link format',
-        'EMAIL_TOO_LONG': 'Email address too long',
-        'EMAIL_INVALID_CHARS': 'Email address contains invalid characters',
-        'UNSAFE_CONNECTION': 'Unsafe connection',
-        'INVALID_QR_IMAGE': 'Invalid QR code image',
-        'QR_GENERATION_FAILED': 'Failed to generate QR code. Please try again later.'
-      }
-    };
-    
-    // 二维码图片 alt 文本多语言映射
-    const qrCodeAltTexts = {
-      'zh': '联系二维码 - 扫描获取邮箱地址',
-      'en': 'Contact QR code - Scan to get email address'
-    };
-    
-    // 语言切换功能
-    function detectLanguage() {
-      // 检测浏览器语言
-      const browserLang = navigator.language || navigator.userLanguage;
-      // 检查是否是中文（包括 zh-CN, zh-TW, zh-HK 等）
-      return browserLang.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    }
-    
-    function switchLanguage(lang) {
-      // 更新全局语言变量
-      currentLang = lang;
-      
-      const html = document.documentElement;
-      html.setAttribute('lang', lang);
-      
-      // 切换页面标题
-      const titles = {
-        'zh': '一杯咖啡引起的伟大畅想',
-        'en': "A Cup of Coffee's Great Vision"
-      };
-      if (titles[lang]) {
-        document.title = titles[lang];
-      }
-      
-      // 切换页面描述
-      const descriptions = {
-        'zh': '一杯咖啡引起的伟大畅想 - Lee的个人页面。每天至少喝一杯咖啡，这是我给自己的片刻宁静。',
-        'en': "A Cup of Coffee's Great Vision - Lee's personal page. At least one cup of coffee every day, a moment of peace for myself."
-      };
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription && descriptions[lang]) {
-        metaDescription.setAttribute('content', descriptions[lang]);
-      }
-      
-      // 切换所有带有 data-en 和 data-zh 属性的元素
-      document.querySelectorAll('[data-en][data-zh]').forEach(function(element) {
-        const text = element.getAttribute('data-' + lang);
-        if (text) {
-          // 如果文本包含 HTML（如 <span>），使用 innerHTML，否则使用 textContent
-          if (text.includes('<')) {
-            // 直接使用 innerHTML，浏览器会自动解码 HTML 实体（如 &quot; 转为 "）
-            element.innerHTML = text;
-          } else {
-            element.textContent = text;
-          }
-        }
-      });
-      
-      // 更新已存在的二维码图片 alt 文本
-      const qrImg = document.querySelector('#qrcode img');
-      if (qrImg && qrCodeAltTexts[lang]) {
-        qrImg.alt = qrCodeAltTexts[lang];
-      }
-      
-      // 更新邮箱标签
-      const emailLabel = document.getElementById('emailLabel');
-      if (emailLabel) {
-        const labelText = emailLabel.getAttribute('data-' + lang);
-        if (labelText) {
-          emailLabel.textContent = labelText;
-        }
-      }
-    }
-    
-    // 安全地显示邮箱地址（防止被爬虫直接抓取）
-    function displayEmailAddress() {
-      const emailDisplay = document.getElementById('emailDisplay');
-      const emailAddress = document.getElementById('emailAddress');
-      
-      if (!emailDisplay || !emailAddress) return;
-      
-      // 从受保护的 emailConfig 获取邮箱
-      if (!emailConfig.isValid || !emailConfig.email) return;
-      
-      // 验证邮箱
-      if (!emailConfig.validate()) return;
-      
-      const email = emailConfig.email;
-      
-      // 完整性检查：确保邮箱地址是预期的值（防止被篡改）
-      if (email !== 'hello@acoffee.com') return;
-      
-      // 再次验证邮箱格式和域名
-      if (!emailRegex.test(email) || !isValidEmailDomain(email)) return;
-      
-      // 验证邮箱长度
-      if (email.length > 254 || email.length < 5) return;
-      
-      // 使用 textContent 安全地显示邮箱（防止 XSS）
-      emailAddress.textContent = email;
-      emailDisplay.style.display = 'block';
-    }
-    
-    // 页面加载时自动切换语言
-    currentLang = detectLanguage();
-    switchLanguage(currentLang);
-    
-    // 使用立即执行函数（IIFE）保护关键配置，防止被外部修改
-    const securityConfig = (function() {
-      // 严格的邮箱格式验证正则表达式（使用 Object.freeze 保护）
-      const emailRegex = Object.freeze(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/);
-      
-      // 允许的邮箱域名白名单（使用 Object.freeze 保护）
-      const ALLOWED_DOMAINS = Object.freeze(['acoffee.com']);
-      
-      // 预期的邮箱地址哈希值（用于完整性检查）
-      const EXPECTED_EMAIL_HASH = '5d41402abc4b2a76b9719d911017c592'; // MD5 of 'hello@acoffee.com'
-      
-      // 验证邮箱域名是否在白名单中
-      function isValidEmailDomain(email) {
-        if (!email || typeof email !== 'string') {
-          return false;
-        }
-        const parts = email.split('@');
-        if (parts.length !== 2) {
-          return false;
-        }
-        const domain = parts[1].toLowerCase();
-        // 直接检查，不使用变量引用，防止被篡改
-        return domain === 'acoffee.com';
-      }
-      
-      // 简单的字符串哈希函数（用于完整性检查）
-      function simpleHash(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-          const char = str.charCodeAt(i);
-          hash = ((hash << 5) - hash) + char;
-          hash = hash & hash; // Convert to 32bit integer
-        }
-        return Math.abs(hash).toString(16);
-      }
-      
-      // 安全地解码邮箱地址
-      function decodeEmail() {
-        try {
-          // Base64 编码的邮箱地址
-          const encoded = 'aGVsbG9AYWNvZmZlZS5jb20=';
-          const decoded = atob(encoded);
-          
-          // 验证解码后的邮箱是否为预期值（防止被篡改）
-          if (decoded !== 'hello@acoffee.com') {
-            console.error('Email integrity check failed');
-            return null;
-          }
-          
-          // 验证邮箱格式
-          if (!emailRegex.test(decoded)) {
-            console.error('Invalid email format');
-            return null;
-          }
-          
-          // 验证邮箱域名是否在白名单中
-          if (!isValidEmailDomain(decoded)) {
-            console.error('Email domain not in whitelist');
-            return null;
-          }
-          
-          // 验证邮箱长度（防止过长）
-          if (decoded.length > 254 || decoded.length < 5) {
-            console.error('Email length invalid');
-            return null;
-          }
-          
-          return decoded;
-        } catch (e) {
-          console.error('Email decoding error:', e);
-          return null;
-        }
-      }
-      
-      // 返回受保护的对象
-      return Object.freeze({
-        emailRegex: emailRegex,
-        ALLOWED_DOMAINS: ALLOWED_DOMAINS,
-        isValidEmailDomain: isValidEmailDomain,
-        decodeEmail: decodeEmail
-      });
-    })();
-    
-    // 使用受保护的配置
-    const emailRegex = securityConfig.emailRegex;
-    const ALLOWED_DOMAINS = securityConfig.ALLOWED_DOMAINS;
-    const isValidEmailDomain = securityConfig.isValidEmailDomain;
-    const decodeEmail = securityConfig.decodeEmail;
-    
-    // 使用立即执行函数（IIFE）保护 email 变量，防止被外部修改
-    const emailConfig = (function() {
-      const email = decodeEmail();
-      if (!email) {
-        console.error('Failed to decode email address');
-        return { email: null, isValid: false };
-      }
-      
-      // 返回只读对象
-      return Object.freeze({
-        email: email,
-        isValid: true,
-        // 提供验证方法，每次生成二维码时重新验证
-        validate: function() {
-          if (!this.email || typeof this.email !== 'string') {
-            return false;
-          }
-          if (!emailRegex.test(this.email)) {
-            return false;
-          }
-          if (!isValidEmailDomain(this.email)) {
-            return false;
-          }
-          if (this.email.length > 254) {
-            return false;
-          }
-          return true;
-        }
-      });
-    })();
-    
-    let qrCodeGenerated = false;
-    
-    // 隐藏加载状态
-    function hideLoading() {
-      const loading = document.getElementById('loading');
-      if (loading) {
-        loading.style.display = 'none';
-      }
-    }
-    
-    // 安全地显示错误消息（避免使用 innerHTML）
-    function showErrorMessage(container, errorCode) {
-      // 清除容器内容
-      while (container.firstChild) {
-        container.removeChild(container.firstChild);
-      }
-      
-      // 根据当前语言获取错误消息
-      const message = errorMessages[currentLang] && errorMessages[currentLang][errorCode] 
-        ? errorMessages[currentLang][errorCode] 
-        : (errorMessages['en'][errorCode] || 'An error occurred');
-      
-      // 使用 createElement 和 textContent 避免 XSS
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'error-message';
-      errorDiv.textContent = message;
-      container.appendChild(errorDiv);
-    }
-    
-    // 使用在线 API 生成二维码（参考 bio_ok 的实现方式）
-    function generateQRCode() {
-      const qrcodeDiv = document.getElementById('qrcode');
-      if (!qrcodeDiv) return;
-      
-      // 严格验证邮箱配置
-      if (!emailConfig.isValid || !emailConfig.email) {
-        showErrorMessage(qrcodeDiv, 'EMAIL_CONFIG_INVALID');
-        return;
-      }
-      
-      // 每次生成前重新验证邮箱（防止变量被篡改）
-      if (!emailConfig.validate()) {
-        showErrorMessage(qrcodeDiv, 'EMAIL_VALIDATION_FAILED');
-        return;
-      }
-      
-      // 获取邮箱地址（从受保护的对象中）
-      const email = emailConfig.email;
-      
-      // 完整性检查：确保邮箱地址是预期的值（防止被篡改）
-      if (email !== 'hello@acoffee.com') {
-        showErrorMessage(qrcodeDiv, 'EMAIL_VALIDATION_FAILED');
-        return;
-      }
-      
-      // 再次验证邮箱格式和域名（双重检查）
-      if (!emailRegex.test(email)) {
-        showErrorMessage(qrcodeDiv, 'INVALID_EMAIL_FORMAT');
-        return;
-      }
-      
-      if (!isValidEmailDomain(email)) {
-        showErrorMessage(qrcodeDiv, 'EMAIL_DOMAIN_NOT_ALLOWED');
-        return;
-      }
-      
-      // 验证邮箱长度
-      if (email.length > 254 || email.length < 5) {
-        showErrorMessage(qrcodeDiv, 'INVALID_EMAIL_FORMAT');
-        return;
-      }
-      
-      // 如果已经生成过，直接返回并显示邮箱
-      if (qrCodeGenerated && qrcodeDiv.querySelector('img')) {
-        hideLoading();
-        displayEmailAddress();
-        return;
-      }
-      
-      // 确保加载状态显示
-      const loading = document.getElementById('loading');
-      if (loading) {
-        loading.style.display = 'flex';
-      }
-      
-      // 清除之前的内容（保留加载状态）
-      const existingImg = qrcodeDiv.querySelector('img');
-      if (existingImg) {
-        existingImg.remove();
-      }
-      
-      // 构建 mailto 链接（只使用验证过的邮箱）
-      const mailtoLink = `mailto:${email}`;
-      
-      // 验证 mailto 链接格式和完整性
-      if (!mailtoLink.startsWith('mailto:') || mailtoLink.length > 300) {
-        showErrorMessage(qrcodeDiv, 'INVALID_EMAIL_LINK');
-        return;
-      }
-      
-      // 完整性检查：确保 mailto 链接包含预期的邮箱
-      if (mailtoLink !== 'mailto:hello@acoffee.com') {
-        showErrorMessage(qrcodeDiv, 'INVALID_EMAIL_LINK');
-        return;
-      }
-      
-      // 使用 encodeURIComponent 防止 URL 注入
-      const emailEncoded = encodeURIComponent(mailtoLink);
-      
-      // 限制 URL 长度，防止过长的参数
-      if (emailEncoded.length > 1000 || emailEncoded.length < 10) {
-        showErrorMessage(qrcodeDiv, 'EMAIL_TOO_LONG');
-        return;
-      }
-      
-      // 验证编码后的字符串不包含恶意字符
-      if (emailEncoded.includes('<') || emailEncoded.includes('>') || emailEncoded.includes('"') || emailEncoded.includes("'") || emailEncoded.includes('javascript:') || emailEncoded.includes('data:')) {
-        showErrorMessage(qrcodeDiv, 'EMAIL_INVALID_CHARS');
-        return;
-      }
-      
-      // 构建二维码 URL（使用固定的 API 端点）
-      const qrApiBase = 'https://api.qrserver.com/v1/create-qr-code/';
-      const qrUrl = qrApiBase + '?size=200x200&data=' + emailEncoded + '&margin=2';
-      
-      // 验证 URL 格式和安全性
-      if (!qrUrl.startsWith('https://api.qrserver.com/v1/create-qr-code/')) {
-        showErrorMessage(qrcodeDiv, 'UNSAFE_CONNECTION');
-        return;
-      }
-      
-      // 创建图片元素
-      const img = document.createElement('img');
-      // 设置 referrerpolicy 防止 referrer 泄露
-      img.referrerPolicy = 'no-referrer';
-      // 最终验证 URL 是否以 HTTPS 开头（双重检查）
-      if (!qrUrl.startsWith('https://')) {
-        showErrorMessage(qrcodeDiv, 'UNSAFE_CONNECTION');
-        return;
-      }
-      // 设置图片源（只使用验证过的 URL）
-      img.src = qrUrl;
-      // 根据当前语言设置 alt 文本
-      img.alt = qrCodeAltTexts[currentLang] || qrCodeAltTexts['en'];
-      img.style.maxWidth = '100%';
-      img.style.height = 'auto';
-      img.style.borderRadius = '4px';
-      img.loading = 'eager'; // 立即加载，因为用户主动点击了
-      img.crossOrigin = 'anonymous'; // 设置 CORS
-      
-      // 图片加载成功
-      img.onload = function() {
-        // 验证图片是否真的加载成功（检查 naturalWidth）
-        if (img.naturalWidth === 0) {
-          showErrorMessage(qrcodeDiv, 'INVALID_QR_IMAGE');
-          return;
-        }
-        hideLoading();
-        qrcodeDiv.appendChild(img);
-        qrCodeGenerated = true;
-        // 显示邮箱地址
-        displayEmailAddress();
-      };
-      
-      // 图片加载失败
-      img.onerror = function() {
-        hideLoading();
-        showErrorMessage(qrcodeDiv, 'QR_GENERATION_FAILED');
-      };
-      
-      // 设置超时保护（10秒）
-      const timeout = setTimeout(function() {
-        if (!qrCodeGenerated) {
-          img.onerror();
-          clearTimeout(timeout);
-        }
-      }, 10000);
-    }
-    
-    // 显示二维码
-    function showQRCode() {
-      const container = document.getElementById('qrcodeContainer');
-      const button = document.getElementById('contactBtn');
-      
-      if (container && button) {
-        container.classList.add('show');
-        button.style.display = 'none';
-        
-        // 如果已经生成过，确保加载状态隐藏并显示邮箱
-        if (qrCodeGenerated) {
-          hideLoading();
-          displayEmailAddress();
-        }
-        
-        generateQRCode();
-      }
-    }
-    
-    // 初始化按钮事件
-    function initContactButton() {
-      const button = document.getElementById('contactBtn');
-      if (button) {
-        button.addEventListener('click', showQRCode);
-      } else {
-        setTimeout(initContactButton, 50);
-      }
-    }
-    
-    // 页面加载完成后初始化
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initContactButton);
-    } else {
-      initContactButton();
-    }
-  </script>
+  <script src="main.js"></script>
 </body>
 </html>
